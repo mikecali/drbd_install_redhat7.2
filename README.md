@@ -16,6 +16,7 @@ Role Variables
 
 ### DRBD Variable
 drbd_repo: http://www.elrepo.org/elrepo-release-7.0-2.el7.elrepo.noarch.rpm
+
 drbd_key: /etc/pki/rpm-gpg/RPM-GPG-KEY-elrepo.org
 
 drbd_packages:
