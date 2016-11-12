@@ -1,0 +1,88 @@
+---
+# tasks file for drbd_install_rhel
+
+- name: Enable DRBD repo
+  shell: rpm -ivh "{{ drbd_repo }}"
+  ignore_errors: yes
+
+- name: Import Epel Public Key
+  shell: rpm --import "{{ drbd_key }}"
+  ignore_errors: yes
+
+- name: Install DRDB Packages
+  yum:
+    name: "{{ item.package }}"
+    state: "{{ item.state }}"
+  with_items: "{{ drbd_packages }}"
+
+- name: load DRDB Module
+  shell: modprobe drbd
+  become: yes
+
+- name: verify if drbd is loaded
+  shell: lsmod | grep drbd
+  register: drdb_loaded
+
+- name: Configuring DRBD on the target host
+  copy:
+    src: mq-resource.res 
+    dest: /etc/drbd.d/
+    owner: root
+    mode: 644
+
+- name: Count scsi hosts for new disks
+  shell: ls /sys/class/scsi_host | wc -l
+  register: scsi_host_count
+
+- name: Rescan for disks for DRBD resources
+  shell: /bin/echo "- - -" > /sys/class/scsi_host/host{{ scsi_host_count.stdout|int-1 }}/scan
+
+- name: Copy Pexpect 3.3
+  copy: 
+    src: python-pexpect-3.3-1mgc30.noarch.rpm
+    dest: /tmp/
+
+- name: Install Pexpect 3.3
+  shell: yum localinstall /tmp/python-pexpect-3.3-1mgc30.noarch.rpm -y 
+
+
+- name: Initialize Metadata storage on each node
+  expect: 
+     command: drbdadm create-md {{ drbd_resource }}
+     responses: 
+       (?i)[need to type 'yes' to confirm]: "yes"
+  ignore_errors: yes 
+
+- name: Start DRBD Daemon
+  service: 
+     name: drbd
+     state: started
+
+- name: Enable DRBD on start
+  service: 
+     name: drbd
+     enabled: yes
+  become: yes
+
+
+- name: Enable DRBD Primary node
+  command: drbdadm primary {{ drbd_resource }}
+  become: yes 
+  when: ansible_hostname == "{{ primary_node }}"
+ 
+- name: Verify DRBD Status
+  shell: drbd=overview
+  register: drbd_primary_status
+
+- name: Create XFS filesystem for DRDB device
+  filesystem: fstype=xfs dev=/dev/drbd0
+  when: "'drbd_primary_status.connected' in output"
+  become: yes
+
+- name: Mount XFS filesystem for DRBD
+  mount: 
+    name: /mq_FS
+    src: /dev/drbd0
+    fstype: xfs
+    state: present
+  become: yes
