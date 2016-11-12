@@ -1,17 +1,27 @@
-Role Name
+DRDB Install and Configure
 =========
 
-A brief description of the role goes here.
+This role is to install drdb on RedHat 7.2 server, configure 2 nodes and mount XFS filesystem.
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+Mounted raw disk on target VM
+DRDB Repo: http://www.elrepo.org/elrepo-release-7.0-2.el7.elrepo.noarch.rpm
+OS Repo: (I use RedHat Satellite)
+python-pexpect-3.3
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+### DRBD Variable
+drbd_repo: http://www.elrepo.org/elrepo-release-7.0-2.el7.elrepo.noarch.rpm
+drbd_key: /etc/pki/rpm-gpg/RPM-GPG-KEY-elrepo.org
+drbd_packages:
+ - { package: 'kmod-drbd84', state: 'latest'  }
+ - { package: 'drbd84-utils', state: 'latest' }
+drbd_resource: mq-resource
+
 
 Dependencies
 ------------
@@ -23,9 +33,13 @@ Example Playbook
 
 Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+- name: DRBD Install/Configure
+  hosts: all
+  user: rhel
+  become: yes
+
+  roles:
+    - { role: drbd_install_redhat7.2 }
 
 License
 -------
@@ -35,4 +49,4 @@ BSD
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+MikeCali. Ansible fanatics
