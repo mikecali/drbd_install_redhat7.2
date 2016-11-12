@@ -17,9 +17,7 @@ Role Variables
 ### DRBD Variable
 ~~~~
 drbd_repo: http://www.elrepo.org/elrepo-release-7.0-2.el7.elrepo.noarch.rpm
-
 drbd_key: /etc/pki/rpm-gpg/RPM-GPG-KEY-elrepo.org
-
 'drbd_packages:'
  - { package: 'kmod-drbd84', state: 'latest'  }
  - { package: 'drbd84-utils', state: 'latest' }
@@ -35,7 +33,7 @@ Example Playbook
 ----------------
 
 Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
+~~~~
 - name: DRBD Install/Configure
   hosts: all
   user: rhel
@@ -43,6 +41,7 @@ Including an example of how to use your role (for instance, with variables passe
 
   roles:
     - { role: drbd_install_redhat7.2 }
+~~~~
 
 License
 -------
