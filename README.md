@@ -15,16 +15,16 @@ Role Variables
 --------------
 
 ### DRBD Variable
+~~~~
+drbd_repo: http://www.elrepo.org/elrepo-release-7.0-2.el7.elrepo.noarch.rpm
 
-'drbd_repo: http://www.elrepo.org/elrepo-release-7.0-2.el7.elrepo.noarch.rpm'
-
-'drbd_key: /etc/pki/rpm-gpg/RPM-GPG-KEY-elrepo.org'
+drbd_key: /etc/pki/rpm-gpg/RPM-GPG-KEY-elrepo.org
 
 'drbd_packages:'
-' - { package: 'kmod-drbd84', state: 'latest'  }'
-' - { package: 'drbd84-utils', state: 'latest' }'
-'drbd_resource: mq-resource'
-
+ - { package: 'kmod-drbd84', state: 'latest'  }
+ - { package: 'drbd84-utils', state: 'latest' }
+drbd_resource: mq-resource
+~~~~
 
 Dependencies
 ------------
